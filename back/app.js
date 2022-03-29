@@ -25,9 +25,18 @@ mongoose
 
 const app = express();
 
+const rateLimit = require("express-rate-limit");
+const attemptsLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 // À partir de la version 4.16 d'Express, bodyparser est inclus et vous n'avez pas besoin de l'installer.
 // Utilisez ( express.json() ) pour analyser le corps de la requête
 app.use(express.json());
+app.use(attemptsLimit);
 
 // Pour éviter les erreurs de CORS (Cross-Origin Resource Sharing), car localhost:3000 et localhost:4200
 app.use((req, res, next) => {
