@@ -39,6 +39,11 @@ exports.modifySauce = (req, res, next) => {
         imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
       }
     : { ...req.body };
+  if (sauceObject.userId !== req.auth.userId) {
+    res.status(400).json({
+      error: new Error("Impossible, sauce créée par un autre utilisateur !"),
+    });
+  }
   Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
     .then(() => res.status(200).json({ message: "Sauce modifiée !" }))
     .catch((error) => res.status(400).json({ error }));
